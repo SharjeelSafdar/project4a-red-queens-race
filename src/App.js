@@ -1,11 +1,11 @@
 import React from 'react';
+import { FlyingBird } from './components/FlyingBird/FlyingBird'
 import './App.css';
 
 function App() {
+  
   return (
-    <div className="App">
-      Hello, World!
-    </div>
+    <FlyingBird />
   );
 }
 
