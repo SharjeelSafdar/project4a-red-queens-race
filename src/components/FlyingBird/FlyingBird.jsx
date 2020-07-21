@@ -13,6 +13,8 @@ export const FlyingBird = () => {
             iterations: Infinity,
         },
         onReady: () => {
+            // Start the animation in the middle.
+            getAnimationClouds().currentTime = getAnimationClouds().effect.getTiming().duration / 2;
             setInterval(() => {
                 if (getAnimationClouds().playbackRate > 1)
                     getAnimationClouds().updatePlaybackRate(
@@ -33,6 +35,8 @@ export const FlyingBird = () => {
             iterations: Infinity,
         },
         onReady: () => {
+            // Start the animation in the middle.
+            getAnimationBirds().currentTime = getAnimationBirds().effect.getTiming().duration / 2;
             setInterval(() => {
                 if (getAnimationBirds().playbackRate > 1)
                 getAnimationBirds().updatePlaybackRate(
