@@ -1,11 +1,11 @@
 import React from 'react';
-import { FlyingBird } from './components/FlyingBird/FlyingBird'
+import { RedQueensRace } from './components/components';
 import './App.css';
 
 function App() {
   
   return (
-    <FlyingBird />
+    <RedQueensRace />
   );
 }
 
