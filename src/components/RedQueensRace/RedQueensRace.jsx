@@ -17,8 +17,9 @@ const RedQueensRace = () => {
         },
         onReady: () => setInterval( () => {
             speedDown();
-            calcScore();
+            // calcScore();
         }, 500 ),
+        onUpdate: () => calcScore(),
     });
     const { ref: foreground1Ref, getAnimation: fore1Animation } = useWebAnimations({
         id: 'foreground1',
@@ -42,6 +43,8 @@ const RedQueensRace = () => {
         keyframes: { transform: [ 'translateX(100%)', 'translateX(-100%)' ]},
         timing: { duration: 36000, iterations: Infinity, },
     });
+
+    // For increasing speed when the screen is clicked/touched.
     const speedUp = () => {
         aliceAnimation().updatePlaybackRate( aliceAnimation().playbackRate * 1.1 );
         fore1Animation().updatePlaybackRate( fore1Animation().playbackRate * 1.1 );
@@ -49,6 +52,7 @@ const RedQueensRace = () => {
         back1Animation().updatePlaybackRate( back1Animation().playbackRate * 1.1 );
         back2Animation().updatePlaybackRate( back2Animation().playbackRate * 1.1 );
     }
+    // For decreasing speed every 500 ms.
     const speedDown = () => {
         // Speed down alice.
         if ( aliceAnimation().playbackRate > 0.4 )
@@ -70,10 +74,8 @@ const RedQueensRace = () => {
             });
         }   
     }
-    const calcScore = () => {
-        setScore( score + Math.floor(fore1Animation().playbackRate) )
-        // console.log(fore1Animation().playbackRate, Math.floor(fore1Animation().playbackRate))
-    }
+    const calcScore = () => setScore( score + fore1Animation().playbackRate / 100 );
+
     return (
         <div className={styles.wrapper} onClick={speedUp} onTouchEnd={speedUp}>
             <div className={styles.sky}></div>
@@ -157,8 +159,15 @@ const RedQueensRace = () => {
             </div>
 
             <div className={styles.scoreCard}>
-                {`${score} m`}
+                {`${Math.floor(score)} m`}
             </div>
+
+            {/* <div>
+                Alice has to cross this valley (1000 m). But doing this in the Wonderland is not an easy task. 
+                She has to keep running to stay in place or else she starts lagging behind. 
+                She has to run double the normal speed to move forward. 
+                Help her by clicking the screen repeatedly to make her run faster.
+            </div> */}
 
         </div>
     )
