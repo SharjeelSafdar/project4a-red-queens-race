@@ -73,6 +73,7 @@
 .rKnight        { top: 50%; left: 70%; height: 40%; }
 .palm2          { top: 35%; left: 90%; height: 65%; }
 
+/* CSS for game features. */
 .scoreCard {
     color: goldenrod;
     font-size: 16px;
@@ -86,4 +87,38 @@
     width: 10%;
     min-width: fit-content;
     z-index: 1;
+}
+
+.gameCard {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    width: 70%;
+    color: goldenrod;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 10px 20px;
+    border: medium solid goldenrod;
+    z-index: 10;
+}
+
+.button {
+    display: block;
+    margin: 10px auto 1px;
+    background: transparent;
+    border: thin solid goldenrod;
+    border-radius: 3px;
+    padding: 3px 10px;
+    color: goldenrod;
+    font-size: 18px;
+}
+.button:hover {
+    border-width: medium;
+    margin: 7px auto 0;
+}
+
+.hidden {
+    visibility: hidden;
 }

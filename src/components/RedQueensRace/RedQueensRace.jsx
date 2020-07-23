@@ -5,8 +5,12 @@ import styles from './RedQueensRace.module.css';
 
 const RedQueensRace = () => {
     const [ score, setScore ] = useState(0);
+    const [ isPlaying, setIsPlaying ] = useState(false);
+    const [ hasFinished, setHasFinished ] = useState(false);
+
     const { ref: aliceRef, getAnimation: aliceAnimation } = useWebAnimations({
         id: "alice",
+        autoPlay: true,
         keyframes: { transform: [ 'translateY(-100%)' ] },
         timing: {
             duration: 600,
@@ -15,42 +19,41 @@ const RedQueensRace = () => {
             iterations: Infinity,
             playbackRate: 1,
         },
-        onReady: () => setInterval( () => {
-            speedDown();
-            // calcScore();
-        }, 500 ),
-        onUpdate: () => calcScore(),
+        onReady: () => setInterval( () => speedDown(), 500 ),
     });
     const { ref: foreground1Ref, getAnimation: fore1Animation } = useWebAnimations({
         id: 'foreground1',
+        autoPlay: false,
         keyframes: { transform: [ 'translateX(100%)', 'translateX(-100%)' ]},
         timing: { duration: 12000, iterations: Infinity, },
         onReady: ({ animation }) => animation.currentTime = animation.effect.getTiming().duration / 2,
+        onUpdate: () => { calcScore(); stopGame(); },
     });
     const { ref: foreground2Ref, getAnimation: fore2Animation } = useWebAnimations({
         id: 'foreground2',
+        autoPlay: false,
         keyframes: { transform: [ 'translateX(100%)', 'translateX(-100%)' ]},
         timing: { duration: 12000, iterations: Infinity, },
     });
     const { ref: background1Ref, getAnimation: back1Animation } = useWebAnimations({
         id: 'background1',
+        autoPlay: false,
         keyframes: { transform: [ 'translateX(100%)', 'translateX(-100%)' ]},
         timing: { duration: 36000, iterations: Infinity, },
         onReady: ({ animation }) => animation.currentTime = animation.effect.getTiming().duration / 2,
     });
     const { ref: background2Ref, getAnimation: back2Animation } = useWebAnimations({
         id: 'background2',
+        autoPlay: false,
         keyframes: { transform: [ 'translateX(100%)', 'translateX(-100%)' ]},
         timing: { duration: 36000, iterations: Infinity, },
     });
+    const animationHandles = [ aliceAnimation, fore1Animation, fore2Animation, back1Animation, back2Animation ];
+    const sceneries = animationHandles.slice(1, 5);
 
     // For increasing speed when the screen is clicked/touched.
     const speedUp = () => {
         aliceAnimation().updatePlaybackRate( aliceAnimation().playbackRate * 1.1 );
-        fore1Animation().updatePlaybackRate( fore1Animation().playbackRate * 1.1 );
-        fore2Animation().updatePlaybackRate( fore2Animation().playbackRate * 1.1 );
-        back1Animation().updatePlaybackRate( back1Animation().playbackRate * 1.1 );
-        back2Animation().updatePlaybackRate( back2Animation().playbackRate * 1.1 );
     }
     // For decreasing speed every 500 ms.
     const speedDown = () => {
@@ -58,23 +61,39 @@ const RedQueensRace = () => {
         if ( aliceAnimation().playbackRate > 0.4 )
             aliceAnimation().updatePlaybackRate( aliceAnimation().playbackRate * 0.9 );
         
-        // Speed down the scenery.
-        const sceneries = [ fore1Animation, fore2Animation, back1Animation, back2Animation ];
-        if (aliceAnimation().playbackRate < .8) {
-            sceneries.forEach(function(anim) {
-                anim().updatePlaybackRate( aliceAnimation().playbackRate/2 * -1 );
-            });
+        // Speed down the scenery items.
+        if (aliceAnimation().playbackRate < 0.8) {
+            sceneries.forEach( anim => anim().updatePlaybackRate( aliceAnimation().playbackRate/2 * -1 ) );
         } else if (aliceAnimation().playbackRate > 1.2) {
-            sceneries.forEach(function(anim) {
-                anim().updatePlaybackRate( aliceAnimation().playbackRate/2 );
-            });
+            sceneries.forEach( anim => anim().updatePlaybackRate( aliceAnimation().playbackRate/2 ) );
         } else {
-            sceneries.forEach(function(anim) {
-                anim().updatePlaybackRate( 0 );    
-            });
+            sceneries.forEach( anim => anim().updatePlaybackRate( 0 ) );
         }   
     }
+
     const calcScore = () => setScore( score + fore1Animation().playbackRate / 100 );
+
+    const startGame = () => {
+        // Normalize the playbback rates.
+        animationHandles.forEach( anim => anim().cancel() );
+        animationHandles.forEach( anim => anim().updatePlaybackRate(1) );
+        // Start the foreground1 and background1 animations from the middle.
+        fore1Animation().currentTime = fore1Animation().effect.getTiming().duration / 2;
+        back1Animation().currentTime = back1Animation().effect.getTiming().duration / 2;
+        // Reset score and other states.
+        setScore(0);
+        setIsPlaying(true);
+        setHasFinished(false);
+        // Play the animations.
+        animationHandles.forEach( anim => anim().play() );
+    }
+
+    const stopGame = () => {
+        if (score >= 1000) {
+            animationHandles.forEach( anim => anim().pause() )
+            setHasFinished(true);
+        }
+    }
 
     return (
         <div className={styles.wrapper} onClick={speedUp} onTouchEnd={speedUp}>
@@ -159,15 +178,25 @@ const RedQueensRace = () => {
             </div>
 
             <div className={styles.scoreCard}>
-                {`${Math.floor(score)} m`}
+                {`${(score >= 1000) ? 1000 : Math.floor(score)} m`}
             </div>
 
-            {/* <div>
-                Alice has to cross this valley (1000 m). But doing this in the Wonderland is not an easy task. 
-                She has to keep running to stay in place or else she starts lagging behind. 
-                She has to run double the normal speed to move forward. 
-                Help her by clicking the screen repeatedly to make her run faster.
-            </div> */}
+            <div className={cx(styles.gameCard, isPlaying ? styles.hidden : null)}>
+                Alice and the Red Queen have to cross this valley (1000 m). But doing this in the 
+                Wonderland is not an easy task. She has to keep running to stay in place or else 
+                she starts lagging behind. She has to run double the normal speed to move forward. 
+                Help her by clicking/touching the screen repeatedly to make her run faster.
+                <button className={styles.button} onClick={() => startGame()}>
+                    Start Game
+                </button>
+            </div>
+
+            <div className={cx(styles.gameCard, !hasFinished ? styles.hidden : null)}>
+                Hurray!!! Alice and the Red Queen have crossed the valley with your valuable help.
+                <button className={styles.button} onClick={() => startGame()}>
+                    Play Again
+                </button>
+            </div>
 
         </div>
     )
