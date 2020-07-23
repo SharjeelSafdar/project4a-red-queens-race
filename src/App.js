@@ -1,9 +1,8 @@
 import React from 'react';
-import { RedQueensRace } from './components/components';
+import RedQueensRace from './RedQueensRace';
 import './App.css';
 
 function App() {
-  
   return (
     <RedQueensRace />
   );
