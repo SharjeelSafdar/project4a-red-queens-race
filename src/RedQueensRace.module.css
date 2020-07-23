@@ -60,7 +60,7 @@
 .foreground2, .background2 { transform: translateX(50%); }
 
 /* foreground1 items */
-.palm3          { top: 50%; left: 10%; height: 105%; }
+.palm3          { top: 50%; left: 10%; height: 105%; z-index: 1; }
 /* foreground2 items */
 .bush           { top: 87%; left: 30%; height: 20%; }
 .wRookUpright   { top: 70%; left: 75%; height: 45%; }
